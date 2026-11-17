@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ULTRON</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='12,10 36,10 36,58 43,68 57,68 64,58 64,10 88,10 88,70 70,90 30,90 12,70' fill='%23e0172b'/%3E%3C/svg%3E">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#12060a; --panel:#1c0a10; --line:#3a1219; --red:#e0172b; --red-hi:#ff3b4d;
+  --text:#f6e9eb; --muted:#a08088; --ok:#4ade80;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{height:100%;margin:0;display:flex;flex-direction:column;background:var(--bg);color:var(--text);
+  font:16px/1.5 "Trebuchet MS","Segoe UI",system-ui,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+header{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
+header svg{width:30px;height:30px;filter:drop-shadow(0 0 6px rgba(224,23,43,.6))}
+header b{font:700 18px/1 Georgia,"Times New Roman",serif;letter-spacing:.22em}
+header span{margin-left:auto;font-size:13px;color:var(--muted)}
+header span i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px}
+#feed{flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:10px}
+.hero{margin:auto;text-align:center;max-width:300px}
+.hero svg{width:150px;height:150px;filter:drop-shadow(0 0 18px rgba(224,23,43,.7));animation:pulse 3s ease-in-out infinite}
+.hero h1{font:700 38px/1.1 Georgia,"Times New Roman",serif;letter-spacing:.3em;margin:14px 0 8px;padding-left:.3em}
+.hero p{margin:0;color:var(--muted)}
+@keyframes pulse{50%{filter:drop-shadow(0 0 30px rgba(255,59,77,.95))}}
+@media (prefers-reduced-motion:reduce){.hero svg{animation:none}}
+.msg{max-width:85%;padding:10px 13px;border-radius:14px;overflow-wrap:anywhere}
+.me{align-self:flex-end;background:var(--red);color:#fff;border-bottom-right-radius:4px}
+.ai{align-self:flex-start;background:var(--panel);border:1px solid var(--line);border-bottom-left-radius:4px}
+.step{align-self:flex-start;font-size:14px;color:var(--muted);border-left:2px solid var(--red);padding:2px 0 2px 10px}
+.step.ok{color:var(--ok);border-color:var(--ok)}
+.step.err{color:var(--red-hi);border-color:var(--red-hi)}
+form{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--line);background:var(--panel)}
+input{flex:1;min-width:0;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:22px;padding:11px 16px;font:inherit}
+input:focus-visible,button:focus-visible{outline:2px solid var(--red-hi);outline-offset:2px}
+button{width:44px;height:44px;border-radius:50%;border:0;background:var(--red);color:#fff;font-size:18px;cursor:pointer}
+button.mic{background:transparent;border:1px solid var(--line);color:var(--muted)}
+button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="logo" viewBox="0 0 100 100">
+    <defs><linearGradient id="ug" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff3b4d"/><stop offset="1" stop-color="#a30f1e"/></linearGradient></defs><polygon points="12,10 36,10 36,58 43,68 57,68 64,58 64,10 88,10 88,70 70,90 30,90 12,70" fill="url(#ug)"/><polygon points="37,40 50,31 63,40 50,49" fill="#ff3b4d"/><circle cx="50" cy="40" r="3.5" fill="#fff4f4"/>
+  </symbol>
+</svg>
+
+<header>
+  <svg><use href="#logo"/></svg>
+  <b>ULTRON</b>
+  <span><i></i>Demo modu</span>
+</header>
+
+<main id="feed">
+  <div class="hero" id="hero">
+    <svg><use href="#logo"/></svg>
+    <h1>ULTRON</h1>
+    <p>Küçük modeller çalışır, büyük modeller denetler. Bir şey yaz ve akışı gör.</p>
+  </div>
+</main>
+
+<form id="f" autocomplete="off">
+  <button type="button" class="mic" id="mic" aria-label="Sesli sohbet"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+  <input id="q" placeholder="ULTRON’a yaz…" aria-label="Mesaj">
+  <button type="submit" aria-label="Gönder"><svg viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
+</form>
+
+<script>
+var feed=document.getElementById('feed'),hero=document.getElementById('hero'),q=document.getElementById('q'),busy=false;
+function add(cls,text){
+  if(hero){hero.remove();hero=null}
+  var d=document.createElement('div');d.className=cls;d.textContent=text;feed.appendChild(d);feed.scrollTop=feed.scrollHeight;return d;
+}
+function run(list,i,done){
+  if(i>=list.length){done();return}
+  setTimeout(function(){add(list[i][0],list[i][1]);run(list,i+1,done)},650);
+}
+document.getElementById('f').addEventListener('submit',function(e){
+  e.preventDefault();
+  var t=q.value.trim();if(!t||busy)return;
+  q.value='';busy=true;add('msg me',t);
+  var fail=/hata/i.test(t);
+  var steps=[
+    ['step','Kontrolcü görevi parçalara böldü'],
+    ['step','Küçük model 1 çalışıyor'],
+    ['step','Küçük model 2 çalışıyor']
+  ];
+  if(fail){
+    steps.push(['step err','Hata: küçük model 2 limite takıldı. Sıradaki modele geçildi.']);
+    steps.push(['step','Küçük model 3 çalışıyor']);
+  }
+  steps.push(['step ok','Kontrolcü denetledi: sorun yok']);
+  run(steps,0,function(){
+    setTimeout(function(){
+      add('msg ai','Bu bir demo. Gerçek yapay zeka modelleri henüz bağlı değil. Bağlandığında cevap burada görünecek.');
+      busy=false;
+    },500);
+  });
+});
+document.getElementById('mic').addEventListener('click',function(){
+  add('step','Sesli sohbet sonraki sürümde gelecek.');
+});
+</script>
+</body>
+</html>
